@@ -16,10 +16,14 @@ export class AppService {
     return 'Hello World!';
   }
 
+  // signupでユーザーアカウント追加すると各マイクロサービスで以下が実行される
+  // communication: 登録したアドレスあてにメールが送信される
+  // analytics: 登録したアドレスがいつ登録されたのか記録される
   createUser(createUserRequest: CreateUserRequest) {
     this.users.push(createUserRequest);
     this.communicationClient.emit(
       'user_created',
+      // newでclass化したデータとして送ると、マイクロサービス側でclassとして受け取れる
       new CreateUserEvent(createUserRequest.email),
     );
     this.analyticsClient.emit(
@@ -29,6 +33,7 @@ export class AppService {
   }
 
   getAnalytics() {
+    // sample-analiticsへ送信して、sample-analitics内の@MessagePatternにて受け取る
     return this.analyticsClient.send({ cmd: 'get_analytics' }, {});
   }
 }
